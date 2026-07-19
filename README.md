@@ -58,6 +58,14 @@ The project progresses week-by-week, starting from a basic single-period model a
 - Ran the **Gamma sweep** ($0 \to T$), plotted the **price-of-robustness curve**, and auto-detected the **elbow** to recommend a $\Gamma$.
 - **Deliverable:** robust model + trade-off analysis (`week7/REPORT.md`).
 
+### 🔹 Week 8: Final Experiments & Report
+**Objective:** Consolidate Weeks 4–6 into one **resilience model** and stress-test it against real-world **disruptions**, then compile the final report.
+- One model = multi-period + two retailers + warehouse **and** retailer capacity + shortage recourse (so shocks show up as priced unmet demand, not infeasibility).
+- **Disruption cases:** reduced supply (`supply_cap`), delayed replenishment (`delay_map`), and limited warehouse capacity (tight `CAP_STORE`), plus a combined shock.
+- **Metrics:** cost breakdown (ordering/holding/shortage), total shortage, and **service level** (% demand met); plus a **resilience-frontier** sweep exposing the chain's disruption threshold.
+- **Finding:** single shocks are survivable but **compound** when combined; tight capacity alone raises cost without stockouts; beyond a threshold some shortage is **structural** (unavoidable at any price).
+- **Deliverable:** final experiments + consolidated report covering Weeks 1–8 (`week8/REPORT.md`).
+
 ---
 
 ## 🚀 How to Run
@@ -76,6 +84,7 @@ Each later week follows the same pattern:
 cd week5 && python week5_capacity_shadow_prices.py   # two retailers, capacity, shadow prices
 cd week6 && python week6_stochastic.py               # stochastic optimization (Parts A & B)
 cd week7 && python week7_robust.py                   # robust optimization + Gamma sweep
+cd week8 && python week8_final_experiments.py        # disruption stress-tests + final report
 ```
 
 ## 📦 Dependencies
