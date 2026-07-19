@@ -34,6 +34,30 @@ The project progresses week-by-week, starting from a basic single-period model a
 - Added complex lead-time constraints: Orders placed at time $t$ arrive at time $t + L$.
 - Ran stress tests to observe how lead times impact feasibility when initial stock is low.
 
+### 🔹 Week 5: Multiple Retailers, Capacity & Shadow Prices
+**Objective:** Serve **two** independent retailers from one warehouse, add a warehouse **storage-capacity** limit, and read the **dual (shadow) prices** of that limit.
+- Added a second retailer with its own demand and balance equation; the warehouse now ships to both ($I_w[t] \mathrel{-}= o_{r1}[t] + o_{r2}[t]$).
+- Imposed the capacity constraint as a **named** constraint `storage_cap_t{t}` (`I_w[t] <= CAP_STORE`) so its shadow price is retrievable.
+- Read shadow prices via `m.constraints['storage_cap_t{t}'].pi` — `0` means the constraint is slack, non-zero means it is a **binding bottleneck**.
+- Experiments: tighten `CAP_STORE`, change $h_{r2}$, change lead time, and observe how the shadow prices and total cost respond.
+- **Deliverable:** multi-retailer LP model with shadow-price analysis.
+
+### 🔹 Week 6: Stochastic Optimization (Demand is Uncertain)
+**Objective:** Capture demand uncertainty with **scenarios** and minimise **expected cost** in a two-stage stochastic LP.
+- **First-stage** orders `o_w[t]` are chosen before demand is known (same across all scenarios); **second-stage** recourse (`o_r`, `I_w`, `I_r`, `short`) adapts per scenario.
+- Objective: $\sum_t c\,o_w[t] + \sum_s p[s]\sum_t (h_w I_w[t][s] + h_r I_r[t][s] + p_{short}\,\text{short}[t][s])$, with balance equations per period **and** per scenario.
+- **Part A:** three manual scenarios (1 retailer, T=5). **Part B:** ten `numpy`-generated scenarios (2 retailers).
+- Compared against the deterministic mean-demand plan (**Value of the Stochastic Solution**), then increased the shortage penalty and demand variability.
+- **Deliverable:** stochastic model + cost-comparison report (`week6/REPORT.md`).
+
+### 🔹 Week 7: Robust Optimization
+**Objective:** Protect against the **worst case** within a demand range — no probabilities needed — and analyse the cost-vs-protection trade-off.
+- **Box uncertainty set:** $d_t \in [\bar d_t - \hat d_t,\ \bar d_t + \hat d_t]$.
+- **Gamma budget** (Bertsimas–Sim): how many periods may hit their worst case simultaneously ($\Gamma=0$ = deterministic, $\Gamma=T$ = fully conservative).
+- Robust no-stockout constraint on cumulative shipments; the protection term is the sum of the $\Gamma$ largest deviations, keeping the model a clean LP.
+- Ran the **Gamma sweep** ($0 \to T$), plotted the **price-of-robustness curve**, and auto-detected the **elbow** to recommend a $\Gamma$.
+- **Deliverable:** robust model + trade-off analysis (`week7/REPORT.md`).
+
 ---
 
 ## 🚀 How to Run
@@ -44,6 +68,14 @@ Each week is contained within its own directory and can be executed independentl
 # Example: Running the Week 4 Multi-Period LP model
 cd week4
 python week4_multiperiod_lead_time.py
+```
+
+Each later week follows the same pattern:
+
+```bash
+cd week5 && python week5_capacity_shadow_prices.py   # two retailers, capacity, shadow prices
+cd week6 && python week6_stochastic.py               # stochastic optimization (Parts A & B)
+cd week7 && python week7_robust.py                   # robust optimization + Gamma sweep
 ```
 
 ## 📦 Dependencies
